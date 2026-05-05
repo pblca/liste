@@ -8,6 +8,13 @@ import (
 	"github.com/pblca/liste/internal/model"
 )
 
+func mustInit(t *testing.T, s *Store, name string) {
+	t.Helper()
+	if err := s.Init(name); err != nil {
+		t.Fatalf("Init failed: %v", err)
+	}
+}
+
 func TestStoreInitAndExists(t *testing.T) {
 	dir := t.TempDir()
 	roadmapPath := filepath.Join(dir, ".liste")
@@ -51,7 +58,7 @@ func TestStoreCreateAndReadItem(t *testing.T) {
 	dir := t.TempDir()
 	roadmapPath := filepath.Join(dir, ".liste")
 	s := New(roadmapPath)
-	s.Init("test")
+	mustInit(t, s, "test")
 
 	cfg, _ := s.ReadConfig()
 	item, err := s.CreateItem(model.TypeFeature, "Test Feature", cfg)
@@ -80,7 +87,7 @@ func TestStoreNextIDIncrement(t *testing.T) {
 	dir := t.TempDir()
 	roadmapPath := filepath.Join(dir, ".liste")
 	s := New(roadmapPath)
-	s.Init("test")
+	mustInit(t, s, "test")
 
 	cfg, _ := s.ReadConfig()
 
@@ -103,12 +110,18 @@ func TestStoreListItems(t *testing.T) {
 	dir := t.TempDir()
 	roadmapPath := filepath.Join(dir, ".liste")
 	s := New(roadmapPath)
-	s.Init("test")
+	mustInit(t, s, "test")
 
 	cfg, _ := s.ReadConfig()
-	s.CreateItem(model.TypeFeature, "Feature A", cfg)
-	s.CreateItem(model.TypeBug, "Bug B", cfg)
-	s.CreateItem(model.TypeTask, "Task C", cfg)
+	if _, err := s.CreateItem(model.TypeFeature, "Feature A", cfg); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := s.CreateItem(model.TypeBug, "Bug B", cfg); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := s.CreateItem(model.TypeTask, "Task C", cfg); err != nil {
+		t.Fatal(err)
+	}
 
 	items, err := s.ListItems()
 	if err != nil {
@@ -123,7 +136,7 @@ func TestStoreDeleteItem(t *testing.T) {
 	dir := t.TempDir()
 	roadmapPath := filepath.Join(dir, ".liste")
 	s := New(roadmapPath)
-	s.Init("test")
+	mustInit(t, s, "test")
 
 	cfg, _ := s.ReadConfig()
 	s.CreateItem(model.TypeFeature, "To Delete", cfg)
@@ -142,7 +155,7 @@ func TestStoreDeleteItemNotFound(t *testing.T) {
 	dir := t.TempDir()
 	roadmapPath := filepath.Join(dir, ".liste")
 	s := New(roadmapPath)
-	s.Init("test")
+	mustInit(t, s, "test")
 
 	err := s.DeleteItem("NONEXISTENT-001")
 	if err == nil {
@@ -154,10 +167,12 @@ func TestStoreIgnoresNonItemFiles(t *testing.T) {
 	dir := t.TempDir()
 	roadmapPath := filepath.Join(dir, ".liste")
 	s := New(roadmapPath)
-	s.Init("test")
+	mustInit(t, s, "test")
 
 	// Create a non-item markdown file
-	os.WriteFile(filepath.Join(roadmapPath, "notes.md"), []byte("# Notes\nJust some notes."), 0644)
+	if err := os.WriteFile(filepath.Join(roadmapPath, "notes.md"), []byte("# Notes\nJust some notes."), 0644); err != nil {
+		t.Fatal(err)
+	}
 
 	items, err := s.ListItems()
 	if err != nil {
@@ -172,7 +187,7 @@ func TestStoreInitAlreadyExists(t *testing.T) {
 	dir := t.TempDir()
 	roadmapPath := filepath.Join(dir, ".liste")
 	s := New(roadmapPath)
-	s.Init("test")
+	mustInit(t, s, "test")
 
 	// Second init should still work (idempotent at store level)
 	// The CLI prevents this, but the store layer just overwrites
@@ -185,10 +200,12 @@ func TestStoreCorruptedState(t *testing.T) {
 	dir := t.TempDir()
 	roadmapPath := filepath.Join(dir, ".liste")
 	s := New(roadmapPath)
-	s.Init("test")
+	mustInit(t, s, "test")
 
 	// Corrupt the state file
-	os.WriteFile(filepath.Join(roadmapPath, ".state.yaml"), []byte("{{invalid yaml"), 0644)
+	if err := os.WriteFile(filepath.Join(roadmapPath, ".state.yaml"), []byte("{{invalid yaml"), 0644); err != nil {
+		t.Fatal(err)
+	}
 
 	// Should recover gracefully
 	state, err := s.ReadState()
@@ -204,10 +221,12 @@ func TestStoreEmptyState(t *testing.T) {
 	dir := t.TempDir()
 	roadmapPath := filepath.Join(dir, ".liste")
 	s := New(roadmapPath)
-	s.Init("test")
+	mustInit(t, s, "test")
 
 	// Empty the state file
-	os.WriteFile(filepath.Join(roadmapPath, ".state.yaml"), []byte(""), 0644)
+	if err := os.WriteFile(filepath.Join(roadmapPath, ".state.yaml"), []byte(""), 0644); err != nil {
+		t.Fatal(err)
+	}
 
 	state, err := s.ReadState()
 	if err != nil {
@@ -221,10 +240,14 @@ func TestStoreEmptyState(t *testing.T) {
 func TestStoreConfigMissingProject(t *testing.T) {
 	dir := t.TempDir()
 	roadmapPath := filepath.Join(dir, ".liste")
-	os.MkdirAll(roadmapPath, 0755)
+	if err := os.MkdirAll(roadmapPath, 0755); err != nil {
+		t.Fatal(err)
+	}
 
 	// Write a config without the project field
-	os.WriteFile(filepath.Join(roadmapPath, "config.yaml"), []byte("statuses: [idea, done]\n"), 0644)
+	if err := os.WriteFile(filepath.Join(roadmapPath, "config.yaml"), []byte("statuses: [idea, done]\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
 
 	s := New(roadmapPath)
 	_, err := s.ReadConfig()
@@ -237,7 +260,7 @@ func TestStoreWriteNilItem(t *testing.T) {
 	dir := t.TempDir()
 	roadmapPath := filepath.Join(dir, ".liste")
 	s := New(roadmapPath)
-	s.Init("test")
+	mustInit(t, s, "test")
 
 	err := s.WriteItem(nil)
 	if err == nil {
@@ -249,7 +272,7 @@ func TestStoreWriteItemEmptyID(t *testing.T) {
 	dir := t.TempDir()
 	roadmapPath := filepath.Join(dir, ".liste")
 	s := New(roadmapPath)
-	s.Init("test")
+	mustInit(t, s, "test")
 
 	err := s.WriteItem(&model.Item{Title: "no id"})
 	if err == nil {

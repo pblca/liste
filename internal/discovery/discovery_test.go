@@ -9,7 +9,9 @@ import (
 func TestFindRootFromExactDir(t *testing.T) {
 	dir := t.TempDir()
 	roadmapDir := filepath.Join(dir, ".liste")
-	os.MkdirAll(roadmapDir, 0755)
+	if err := os.MkdirAll(roadmapDir, 0755); err != nil {
+		t.Fatal(err)
+	}
 
 	result, err := FindRoot(dir)
 	if err != nil {
@@ -23,10 +25,14 @@ func TestFindRootFromExactDir(t *testing.T) {
 func TestFindRootFromSubdir(t *testing.T) {
 	dir := t.TempDir()
 	roadmapDir := filepath.Join(dir, ".liste")
-	os.MkdirAll(roadmapDir, 0755)
+	if err := os.MkdirAll(roadmapDir, 0755); err != nil {
+		t.Fatal(err)
+	}
 
 	subDir := filepath.Join(dir, "sub", "deep")
-	os.MkdirAll(subDir, 0755)
+	if err := os.MkdirAll(subDir, 0755); err != nil {
+		t.Fatal(err)
+	}
 
 	result, err := FindRoot(subDir)
 	if err != nil {

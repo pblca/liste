@@ -307,5 +307,5 @@ func renderContextJSON(data contextData) {
 
 	enc := json.NewEncoder(os.Stdout)
 	enc.SetIndent("", "  ")
-	enc.Encode(out)
+	_ = enc.Encode(out)
 }

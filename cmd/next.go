@@ -151,5 +151,5 @@ func renderNextJSON(items []itemWithProject) {
 
 	enc := json.NewEncoder(os.Stdout)
 	enc.SetIndent("", "  ")
-	enc.Encode(candidates)
+	_ = enc.Encode(candidates)
 }

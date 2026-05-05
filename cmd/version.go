@@ -36,7 +36,7 @@ func runVersion(cmd *cobra.Command, args []string) error {
 	if flagJSON {
 		enc := json.NewEncoder(os.Stdout)
 		enc.SetIndent("", "  ")
-		enc.Encode(map[string]string{
+		_ = enc.Encode(map[string]string{
 			"version": buildVersion,
 			"commit":  buildCommit,
 			"date":    buildDate,

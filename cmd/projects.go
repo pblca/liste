@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"github.com/pblca/liste/internal/discovery"
 	"github.com/pblca/liste/internal/output"
 	"github.com/pblca/liste/internal/store"
 	"github.com/spf13/cobra"
@@ -48,9 +47,4 @@ func runProjects(cmd *cobra.Command, args []string) error {
 	f := getFormatter()
 	f.ProjectList(rootName, subs)
 	return nil
-}
-
-// getDiscoveryResult is used by other commands that need full discovery.
-func getDiscoveryResult() (*discovery.Result, error) {
-	return getDiscovery()
 }

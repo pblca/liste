@@ -211,5 +211,5 @@ func renderTreeJSON(node *treeNode) {
 
 	enc := json.NewEncoder(os.Stdout)
 	enc.SetIndent("", "  ")
-	enc.Encode(convert(node))
+	_ = enc.Encode(convert(node))
 }

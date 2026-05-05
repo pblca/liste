@@ -343,7 +343,7 @@ func renderRoadmapJSON(phases []phaseGroup, unphased []projectItems) {
 
 	enc := json.NewEncoder(os.Stdout)
 	enc.SetIndent("", "  ")
-	enc.Encode(result)
+	_ = enc.Encode(result)
 }
 
 func renderPhaseDetail(phases []phaseGroup, phaseNum int) error {
@@ -402,7 +402,7 @@ func renderPhaseDetail(phases []phaseGroup, phaseNum int) error {
 		}
 		enc := json.NewEncoder(os.Stdout)
 		enc.SetIndent("", "  ")
-		enc.Encode(result)
+		_ = enc.Encode(result)
 		return nil
 	}
 

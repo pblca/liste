@@ -129,9 +129,13 @@ func TestBuildGraph(t *testing.T) {
 func TestDepsResolved(t *testing.T) {
 	dir := t.TempDir()
 	roadmapPath := filepath.Join(dir, ".liste")
-	os.MkdirAll(roadmapPath, 0755)
+	if err := os.MkdirAll(roadmapPath, 0755); err != nil {
+		t.Fatal(err)
+	}
 	s := store.New(roadmapPath)
-	s.Init("test")
+	if err := s.Init("test"); err != nil {
+		t.Fatal(err)
+	}
 
 	now := time.Now()
 
@@ -140,14 +144,18 @@ func TestDepsResolved(t *testing.T) {
 		ID: "TASK-001", Type: model.TypeTask, Title: "Done Task",
 		Status: "done", Priority: "medium", Created: now, Updated: now,
 	}
-	s.WriteItem(doneItem)
+	if err := s.WriteItem(doneItem); err != nil {
+		t.Fatal(err)
+	}
 
 	// Target is not done
 	pendingItem := &model.Item{
 		ID: "TASK-002", Type: model.TypeTask, Title: "Pending Task",
 		Status: "planned", Priority: "medium", Created: now, Updated: now,
 	}
-	s.WriteItem(pendingItem)
+	if err := s.WriteItem(pendingItem); err != nil {
+		t.Fatal(err)
+	}
 
 	allItems := map[string]*model.Item{
 		"TASK-001": doneItem,

@@ -31,11 +31,6 @@ func init() {
 	rootCmd.AddCommand(diffCmd)
 }
 
-type diffEntry struct {
-	Item    itemWithProject
-	Action  string // "created" or "updated"
-}
-
 func runDiff(cmd *cobra.Command, args []string) error {
 	allItems, _, _, err := collectAllItems()
 	if err != nil {
@@ -111,7 +106,7 @@ func runDiff(cmd *cobra.Command, args []string) error {
 		}
 		enc := json.NewEncoder(os.Stdout)
 		enc.SetIndent("", "  ")
-		enc.Encode(out)
+		_ = enc.Encode(out)
 		return nil
 	}
 

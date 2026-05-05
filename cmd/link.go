@@ -41,12 +41,8 @@ func runLink(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	// Check target exists (in same project)
-	_, err = s.ReadItem(target)
-	if err != nil {
-		// Could be cross-project — allow it with a warning
-		// For now, just proceed (cross-project refs will be validated differently)
-	}
+	// Check target exists (in same project) — cross-project refs are allowed
+	_, _ = s.ReadItem(target)
 
 	// Check for duplicate link
 	for _, existing := range item.Links {

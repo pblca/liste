@@ -85,7 +85,7 @@ func runStale(cmd *cobra.Command, args []string) error {
 		}
 		enc := json.NewEncoder(os.Stdout)
 		enc.SetIndent("", "  ")
-		enc.Encode(out)
+		_ = enc.Encode(out)
 		return nil
 	}
 

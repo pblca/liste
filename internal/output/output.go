@@ -270,5 +270,5 @@ func (f *Formatter) Error(err error) {
 func (f *Formatter) json(v any) {
 	enc := json.NewEncoder(f.Writer)
 	enc.SetIndent("", "  ")
-	enc.Encode(v)
+	_ = enc.Encode(v)
 }

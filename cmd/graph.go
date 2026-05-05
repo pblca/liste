@@ -1,7 +1,9 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/pblca/liste/internal/resolver"
@@ -37,8 +39,6 @@ func runGraph(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	f := getFormatter()
-
 	if flagJSON {
 		// JSON mode handled differently
 		type jsonNode struct {
@@ -58,7 +58,9 @@ func runGraph(cmd *cobra.Command, args []string) error {
 				Project:  n.Project,
 			})
 		}
-		f.Message(fmt.Sprintf("Graph for %s: %s (%d connections)", id, item.Title, len(nodes)))
+		enc := json.NewEncoder(os.Stdout)
+		enc.SetIndent("", "  ")
+		_ = enc.Encode(jNodes)
 		return nil
 	}
 
